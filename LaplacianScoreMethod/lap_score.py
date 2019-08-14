@@ -1,5 +1,6 @@
 import numpy as np
-
+from scipy.sparse import *
+from LaplacianScoreMethod.construct_W import construct_W
 
 
 def lap_score(X, **kwargs):
@@ -23,4 +24,32 @@ def lap_score(X, **kwargs):
 
     if 'W' not in kwargs.keys():
         W = construct_W(X)
+    # construct the affinity matrix W
+    W = kwargs['W']
+    # build the diagonal D matrix from affinity matrix W
+    D = np.array(W.sum(axis=1))
+    L = W
+    tmp = np.dot(np.transpose(D), X)
+    D = diags(np.transpose(D), [0])
+    Xt = np.transpose(X)
+    t1 = np.transpose(np.dot(Xt, D.todense()))
+    t2 = np.transpose(np.dot(Xt, L.todense()))
+    # compute the numerator of Lr
+    D_prime = np.sum(np.multiply(t1, X), 0) - np.multiply(tmp, tmp)/D.sum()
+    # compute the denominator of Lr
+    L_prime = np.sum(np.multiply(t2, X), 0) - np.multiply(tmp, tmp)/D.sum()
+    # avoid the denominator of Lr to be 0
+    D_prime[D_prime < 1e-12] = 10000
 
+    # compute Laplacian Score for all features
+    score = 1 - np.array(np.multiply(L_prime, 1/D_prime))[0, :]
+    return np.transpose(score)
+
+
+def feature_ranking(score):
+    """
+    Rank features in ascending order according to their laplacian scores,
+    the smaller the Laplacian Score is, the more important the feature is
+    """
+    idx = np.argsort(score, 0)
+    return idx

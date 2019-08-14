@@ -1,7 +1,8 @@
 import scipy.io
-from skfeature.function.similarity_based import lap_score
-from skfeature.utility import construct_W
-from skfeature.utility import unsupervised_evaluation
+#from skfeature.function.similarity_based import lap_score
+#from skfeature.utility import construct_W
+from LaplacianScoreMethod import construct_W
+from LaplacianScoreMethod import lap_score
 
 mat = scipy.io.loadmat('/home/zealshen/DATA/DATAfromASU/FaceImageData/COIL20.mat')
 X = mat['X']
