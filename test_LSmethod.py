@@ -22,3 +22,4 @@ idx = lap_score.feature_ranking(score)
 
 print('Score:', score)
 print('Index:', idx)
+
